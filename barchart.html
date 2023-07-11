@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>US Median Income Bar Chart</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        .bar {
+            fill: steelblue;
+        }
+    </style>
+</head>
+<body>
+    <div id="bar-chart"></div>
+
+    <script>
+        // Margin, width and height
+        const margin = {top: 20, right: 20, bottom: 70, left: 40};
+        const width = 960 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
+
+        // Create SVG element
+        const svg = d3.select("#bar-chart")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        // Load data
+        d3.csv("State_Income_Clean.csv").then(data => {
+            // Parse and prepare the data
+            data.forEach(d => {
+                d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
+            });
+
+            // Create scales
+            const x = d3.scaleBand()
+                .domain(data.map(d => d.state))
+                .range([0, width])
+                .padding(0.1);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d['2021 Median income'])])
+                .range([height, 0]);
+
+            // Add X axis
+            svg.append("g")
+                .attr("transform", `translate(0, ${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .attr("transform", "translate(-10,0)rotate(-45)")
+                .style("text-anchor", "end");
+
+            // Add Y axis
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            // Add bars
+            svg.selectAll(".bar")
+                .data(data)
+                .join("rect")
+                .attr("class", "bar")
+                .attr("x", d => x(d.state))
+                .attr("width", x.bandwidth())
+                .attr("y", d => y(d['2021 Median income']))
+                .attr("height", d => height - y(d['2021 Median income']));
+        });
+    </script>
+</body>
+</html>
