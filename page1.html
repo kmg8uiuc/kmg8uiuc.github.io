@@ -97,11 +97,6 @@
                 .style("border-width", "1px")
                 .style("border-radius", "5px")
                 .style("padding", "10px");
-            //legend
-            var color = d3.scaleOrdinal()
-                .domain(["Democratic", "Republican"])
-                .range(["blue", "red"]);
-            });
                 
              // Add the legend
             var legend = svg.selectAll(".legend")
@@ -125,7 +120,10 @@
              .style("text-anchor", "end")
              .text(function(d) { return d; });
 
-            
+             var color = d3.scaleOrdinal()
+                .domain(["Democratic", "Republican"])
+                .range(["blue", "red"]);
+            });
   </script>
   <button class="button" onclick="location.href='index.html'">Previous</button>
   <button class="button" onclick="location.href='page2.html'">Next</button>
