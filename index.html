@@ -25,13 +25,45 @@
     </div>
 
     <script>
-        // Scatterplot code...
-    
+        // Margin, width and height
+        const margin = {top: 20, right: 20, bottom: 30, left: 40};
+        const width = 960 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
+
+        // Create SVG element
+        const svg = d3.select("#scatter-plot")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
         // Load data
         d3.csv("State_Income_Clean.csv").then(data => {
             // Parse and prepare the data
-            // ...
-    
+            data.forEach(d => {
+                d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
+                d['YoY Growth'] = +d['YoY Growth'].replace('%', '');
+            });
+
+            // Create scales
+            const x = d3.scaleLinear()
+                .domain(d3.extent(data, d => d['YoY Growth']))
+                .range([0, width]);
+
+            const y = d3.scaleLinear()
+                .domain(d3.extent(data, d => d['2021 Median income']))
+                .range([height, 0]);
+
+            // Add X axis
+            svg.append("g")
+                .attr("transform", `translate(0, ${height})`)
+                .call(d3.axisBottom(x));
+
+            // Add Y axis
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
             // Add dots
             svg.selectAll("dot")
                 .data(data)
@@ -51,7 +83,7 @@
                 .on("mouseout", function() {
                     tooltip.style("visibility", "hidden");
                 });
-    
+
             // Create a div for the tooltip
             var tooltip = d3.select("body")
                 .append("div")
@@ -63,8 +95,7 @@
                 .style("border-width", "1px")
                 .style("border-radius", "5px")
                 .style("padding", "10px");
-        });
-    </script>
-    
+            });
+        </script>
 </body>
 </html>
