@@ -25,7 +25,7 @@
     </div>
 
     <script>
-    var margin = {top: 20, right: 20, bottom: 60, left: 100};  // Increased left margin
+    var margin = {top: 20, right: 20, bottom: 60, left: 120};  // Further increased left margin
     var width = 960 - margin.left - margin.right;
     var height = 500 - margin.top - margin.bottom;
 
@@ -45,20 +45,12 @@
                 d['YoY Growth'] = +d['YoY Growth'].replace('%', '');
             });
 
-            // Define scales
-        var x = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d['YoY Growth'])])
-            .range([ 0, width ]);
-        var y = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d['2021 Median income'])])
-            .range([ height, 0]);
-
         // Define scales
         var x = d3.scaleLinear()
             .domain([0, d3.max(data, d => d['YoY Growth'])])
             .range([ 0, width ]);
         var y = d3.scaleLinear()
-            .domain([30000, d3.max(data, d => d['2021 Median income'])])  // Start y-axis at 30,000
+            .domain([35000, d3.max(data, d => d['2021 Median income'])])  // Start y-axis at 35,000
             .range([ height, 0]);
 
         // Create axes
@@ -78,20 +70,21 @@
         // Add Y-Axis label
         svg.append("text")
             .attr("text-anchor", "end")
-            .attr("y", -margin.left / 2)
+            .attr("y", -margin.left + 20)  // Moved the label a bit more to the left
             .attr("dy", ".75em")
             .attr("transform", "rotate(-90)")
             .text("Median Income");
 
-
-            // Add dots
-            svg.selectAll("dot")
-              .data(data)
-              .join("circle")
-              .attr("r", 3.5)
-              .attr("cx", d => x(d['YoY Growth']))
-              .attr("cy", d => y(d['2021 Median income']))
-              .attr("fill", "steelblue")
+        // Add dots
+        svg.append('g')
+            .selectAll("dot")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) { return x(d['YoY Growth']); } )
+            .attr("cy", function (d) { return y(d['2021 Median income']); } )
+            .attr("r", 5)
+            .attr("fill", "green")
               .on("mouseover", function(event, d) {
                   tooltip.style("visibility", "visible")
                       .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
