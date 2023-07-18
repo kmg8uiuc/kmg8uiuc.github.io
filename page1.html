@@ -90,6 +90,18 @@
                  .duration(500)
                  .style("opacity", 0);
             });
+            // Create a div for the tooltip
+            var tooltip = d3.select("body")
+                .append("div")
+                .style("position", "absolute")
+                .style("z-index", "10")
+                .style("visibility", "hidden")
+                .style("background", "#ffffff")
+                .style("border", "solid")
+                .style("border-width", "1px")
+                .style("border-radius", "5px")
+                .style("padding", "10px");
+                
         
     });
   </script>
