@@ -66,23 +66,24 @@
 
             // Add dots
             svg.selectAll("dot")
-                .data(data)
-                .join("circle")
-                .attr("r", 3.5)
-                .attr("cx", d => x(d['YoY Growth']))
-                .attr("cy", d => y(d['2021 Median income']))
-                .attr("fill", "steelblue")
-                .on("mouseover", function(event, d) {
-                    tooltip.style("visibility", "visible")
-                        .html(`State: ${d.state}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
+              .data(data)
+              .join("circle")
+              .attr("r", 3.5)
+              .attr("cx", d => x(d['YoY Growth']))
+              .attr("cy", d => y(d['2021 Median income']))
+              .attr("fill", "steelblue")
+              .on("mouseover", function(event, d) {
+                  tooltip.style("visibility", "visible")
+                      .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
                 })
-                .on("mousemove", function(event) {
-                    tooltip.style("top", (event.pageY-10)+"px")
-                        .style("left",(event.pageX+10)+"px");
-                })
-                .on("mouseout", function() {
-                    tooltip.style("visibility", "hidden");
-                });
+             .on("mousemove", function(event) {
+                   tooltip.style("top", (event.pageY-10)+"px")
+                      .style("left",(event.pageX+10)+"px");
+             })
+             .on("mouseout", function() {
+                 tooltip.style("visibility", "hidden");
+             });
+
 
             // Create a div for the tooltip
             var tooltip = d3.select("body")
