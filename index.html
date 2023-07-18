@@ -25,18 +25,17 @@
     </div>
 
     <script>
-        // Margin, width and height
-        var margin = {top: 20, right: 20, bottom: 60, left: 60};
-        var width = 960 - margin.left - margin.right;
-        var height = 500 - margin.top - margin.bottom;
+    var margin = {top: 20, right: 20, bottom: 60, left: 100};  // Increased left margin
+    var width = 960 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
 
-        // Append SVG and group
-        var svg = d3.select("body")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    // Append SVG and group
+    var svg = d3.select("body")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         // Load data
         d3.csv("State_Income_Clean.csv").then(data => {
@@ -52,6 +51,14 @@
             .range([ 0, width ]);
         var y = d3.scaleLinear()
             .domain([0, d3.max(data, d => d['2021 Median income'])])
+            .range([ height, 0]);
+
+        // Define scales
+        var x = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d['YoY Growth'])])
+            .range([ 0, width ]);
+        var y = d3.scaleLinear()
+            .domain([30000, d3.max(data, d => d['2021 Median income'])])  // Start y-axis at 30,000
             .range([ height, 0]);
 
         // Create axes
