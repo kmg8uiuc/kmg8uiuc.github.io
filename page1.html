@@ -119,6 +119,10 @@
              .attr("dy", ".35em")
              .style("text-anchor", "end")
              .text(function(d) { return d; });
+
+             var color = d3.scaleOrdinal()
+                .domain(["Democratic", "Republican"])
+                .range(["blue", "red"]);
             });
   </script>
   <button class="button" onclick="location.href='index.html'">Previous</button>
