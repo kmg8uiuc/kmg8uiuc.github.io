@@ -55,11 +55,11 @@
 
         // Create axes
         svg.append("g")
-            .attr("transform", "translate(" + x(0) + "," + height + ")")  // Moved x-axis to where y=0
+            .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x));
         svg.append("g")
-            .attr("transform", "translate(" + x(0) + ", 0)")  // Moved y-axis to where x=0
             .call(d3.axisLeft(y));
+
         // Add X-Axis label
         svg.append("text")
             .attr("text-anchor", "end")
