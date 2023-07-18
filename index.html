@@ -48,6 +48,7 @@
         // Define scales
         var x = d3.scaleLinear()
             .domain([0, d3.max(data, d => d['YoY Growth'])])
+            .range([ 0, width ]);
         var y = d3.scaleLinear()
             .domain([35000, d3.max(data, d => d['2021 Median income'])])  // Start y-axis at 35,000
             .range([ height, 0]);
