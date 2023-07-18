@@ -25,6 +25,9 @@
     ]).then(function(values) {
       var incomeData = values[0];
       var partyData = values[1];
+      var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
       // Convert party data to a dictionary for easy lookup
       var partyLookup = {};
@@ -61,12 +64,26 @@
           .call(d3.axisBottom(x));
 
       svg.selectAll("dot")
-          .data(incomeData)
-        .enter().append("circle")
-          .attr("cx", function(d) { return x(d['YoY Growth']); })
-          .attr("cy", function(d) { return y(d['2021 Median income']); })
-          .attr("r", 5)
-          .style("fill", function(d) { return color(d.Party); });  // Use party color
+            .data(incomeData)
+            .enter().append("circle")
+            .attr("cx", function(d) { return x(d['YoY Growth']); })
+         .attr("cy", function(d) { return y(d['2021 Median income']); })
+         .attr("r", 5)
+         .style("fill", function(d) { return color(d.Party); })
+         .on("mouseover", function(d) {
+                tooltip.transition()
+                  .duration(200)
+                  .style("opacity", .9);
+              tooltip.html(d.state + "<br/>" + "Income: " + d['2021 Median income'] + "<br/>" + "YoY Growth: " + d['YoY Growth'])
+                 .style("left", (d3.event.pageX + 5) + "px")
+                  .style("top", (d3.event.pageY - 28) + "px");
+          })
+          .on("mouseout", function(d) {
+             tooltip.transition()
+                 .duration(500)
+                 .style("opacity", 0);
+          });
+            
 
     });
   </script>
