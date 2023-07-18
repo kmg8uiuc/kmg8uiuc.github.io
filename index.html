@@ -26,17 +26,17 @@
 
     <script>
         // Margin, width and height
-        const margin = {top: 20, right: 20, bottom: 30, left: 40};
-        const width = 960 - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
+        var margin = {top: 20, right: 20, bottom: 60, left: 60};
+        var width = 960 - margin.left - margin.right;
+        var height = 500 - margin.top - margin.bottom;
 
-        // Create SVG element
-        const svg = d3.select("#scatter-plot")
+        // Append SVG and group
+        var svg = d3.select("body")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
-            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         // Load data
         d3.csv("State_Income_Clean.csv").then(data => {
@@ -63,18 +63,18 @@
 
         // Add X-Axis label
         svg.append("text")
-        .attr("text-anchor", "end")
-        .attr("x", width)
-        .attr("y", height + margin.top + 20)
-        .text("Year-Over-Year Growth");
+            .attr("text-anchor", "end")
+            .attr("x", width)
+            .attr("y", height + margin.bottom / 2)
+            .text("Year-Over-Year Growth");
 
         // Add Y-Axis label
         svg.append("text")
-        .attr("text-anchor", "end")
-        .attr("y", -margin.left + 20)
-        .attr("dy", ".75em")
-        .attr("transform", "rotate(-90)")
-        .text("Median Income");
+            .attr("text-anchor", "end")
+            .attr("y", -margin.left / 2)
+            .attr("dy", ".75em")
+            .attr("transform", "rotate(-90)")
+            .text("Median Income");
 
 
             // Add dots
