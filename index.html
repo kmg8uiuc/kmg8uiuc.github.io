@@ -46,23 +46,35 @@
                 d['YoY Growth'] = +d['YoY Growth'].replace('%', '');
             });
 
-            // Create scales
-            const x = d3.scaleLinear()
-                .domain(d3.extent(data, d => d['YoY Growth']))
-                .range([0, width]);
+            // Define scales
+        var x = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d['YoY Growth'])])
+            .range([ 0, width ]);
+        var y = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d['2021 Median income'])])
+            .range([ height, 0]);
 
-            const y = d3.scaleLinear()
-                .domain(d3.extent(data, d => d['2021 Median income']))
-                .range([height, 0]);
+        // Create axes
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+        svg.append("g")
+            .call(d3.axisLeft(y));
 
-            // Add X axis
-            svg.append("g")
-                .attr("transform", `translate(0, ${height})`)
-                .call(d3.axisBottom(x));
+        // Add X-Axis label
+        svg.append("text")
+            .attr("text-anchor", "end")
+            .attr("x", width)
+            .attr("y", height - 6)
+            .text("Year-Over-Year Growth");
 
-            // Add Y axis
-            svg.append("g")
-                .call(d3.axisLeft(y));
+        // Add Y-Axis label
+        svg.append("text")
+            .attr("text-anchor", "end")
+            .attr("y", 6)
+            .attr("dy", ".75em")
+            .attr("transform", "rotate(-90)")
+            .text("Median Income");
 
             // Add dots
             svg.selectAll("dot")
