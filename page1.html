@@ -1,75 +1,76 @@
 <!DOCTYPE html>
-<html>
 <head>
-    <title>US Median Income Bar Chart</title>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
-    <style>
-        .bar {
-            fill: steelblue;
-        }
-    </style>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-
+  <title>Income by State With Political Party</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="bar-chart"></div>
-    <div class="button-container">
-        <button onClick="window.location.href='index.html';">Previous</button>
-        <button onClick="window.location.href='page2.html';">Next</button>
-    </div>    
-    <script>
-        // Margin, width and height
-        const margin = {top: 20, right: 20, bottom: 70, left: 40};
-        const width = 960 - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
+  <h1>Income by State With Political Party</h1>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script>
+    var margin = {top: 20, right: 20, bottom: 60, left: 120};
+    var width = 960 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
 
-        // Create SVG element
-        const svg = d3.select("#bar-chart")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    var svg = d3.select("body")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // Load data
-        d3.csv("State_Income_Clean.csv").then(data => {
-            // Parse and prepare the data
-            data.forEach(d => {
-                d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
-            });
+    // Load both CSV files and wait until they are both loaded before proceeding
+    Promise.all([
+      d3.csv('State_Income_Clean.csv'),
+      d3.csv('State_gov_party.csv')
+    ]).then(function(values) {
+      var incomeData = values[0];
+      var partyData = values[1];
 
-            // Create scales
-            const x = d3.scaleBand()
-                .domain(data.map(d => d.state))
-                .range([0, width])
-                .padding(0.1);
+      // Convert party data to a dictionary for easy lookup
+      var partyLookup = {};
+      partyData.forEach(function(d) {
+        partyLookup[d.State] = d.Party;
+      });
 
-            const y = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d['2021 Median income'])])
-                .range([height, 0]);
+      // Parse and prepare the income data
+      incomeData.forEach(d => {
+        d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
+        d['YoY Growth'] = +d['YoY Growth'].slice(0, -1);
+        d.Party = partyLookup[d.state];  // Add party data
+      });
 
-            // Add X axis
-            svg.append("g")
-                .attr("transform", `translate(0, ${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll("text")
-                .attr("transform", "translate(-10,0)rotate(-45)")
-                .style("text-anchor", "end");
+      var x = d3.scaleLinear()
+          .domain([d3.min(incomeData, d => d['YoY Growth']), d3.max(incomeData, d => d['YoY Growth'])])
+          .range([0, width]);
 
-            // Add Y axis
-            svg.append("g")
-                .call(d3.axisLeft(y));
+      var y = d3.scaleLinear()
+          .domain([35000, d3.max(incomeData, d => d['2021 Median income'])])
+          .range([height, 0]);
 
-            // Add bars
-            svg.selectAll(".bar")
-                .data(data)
-                .join("rect")
-                .attr("class", "bar")
-                .attr("x", d => x(d.state))
-                .attr("width", x.bandwidth())
-                .attr("y", d => y(d['2021 Median income']))
-                .attr("height", d => height - y(d['2021 Median income']));
-        });
-    </script>
+      // Color scale
+      var color = d3.scaleOrdinal()
+          .domain(["Democratic", "Republican"])
+          .range(["blue", "red"]);
+
+      svg.append("g")
+          .attr("transform", "translate(" + x(0) + ",0)")
+          .call(d3.axisLeft(y));
+
+      svg.append("g")
+          .attr("transform", "translate(0," + y(35000) + ")")
+          .call(d3.axisBottom(x));
+
+      svg.selectAll("dot")
+          .data(incomeData)
+        .enter().append("circle")
+          .attr("cx", function(d) { return x(d['YoY Growth']); })
+          .attr("cy", function(d) { return y(d['2021 Median income']); })
+          .attr("r", 5)
+          .style("fill", function(d) { return color(d.Party); });  // Use party color
+
+    });
+  </script>
+  <button class="button" onclick="location.href='page2.html'">Next</button>
+  <button class="button" onclick="location.href='index.html'">Previous</button>
 </body>
 </html>
