@@ -1,13 +1,97 @@
 <!DOCTYPE html>
-<html>
 <head>
-    <title>Page 2</title>
+    <title>Page 2 - Population Density</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <div class="button-container">
-        <button onClick="window.location.href='page1.html';">Previous</button>
-    </div>
+    <h1>Income by State - Rural vs Urban</h1>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script>
+        // Set dimensions and margins
+        const margin = {top: 40, right: 30, bottom: 70, left: 60},
+            width = 460 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+        // Append SVG object
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        Promise.all([
+            d3.csv("State_Income_Clean.csv"),
+            d3.csv("State_Pop_Clean.csv")
+        ]).then(([incomeData, popData]) => {
+            const popLookup = {};
+            popData.forEach(d => {
+                d["Population Density"] = +d["Population Density"];
+                popLookup[d.State] = d["Population Density"];
+            });
+
+            // Calculate median population density
+            const popDensities = popData.map(d => d["Population Density"]);
+            const medianPopDensity = d3.median(popDensities);
+
+            // Add 'Urban/Rural' column
+            incomeData.forEach(d => {
+                d["Urban/Rural"] = popLookup[d.state] > medianPopDensity ? "Urban" : "Rural";
+                d["2021 Median income"] = +d["2021 Median income"].replace(/,/g, '');
+                d["YoY Growth"] = +d["YoY Growth"].replace(/%/g, '');
+            });
+
+            // Create color scale
+            const color = d3.scaleOrdinal()
+                .domain(["Urban", "Rural"])
+                .range(["orange", "green"]);
+
+            // Axes and scales
+            const x = d3.scaleLinear().domain([d3.min(incomeData, d => d["YoY Growth"]), d3.max(incomeData, d => d["YoY Growth"])]).nice().range([0, width]);
+            const y = d3.scaleLinear().domain([35000, d3.max(incomeData, d => d["2021 Median income"])]).nice().range([height, 0]);
+
+            // Add dots
+            svg.append('g')
+                .selectAll("dot")
+                .data(incomeData)
+                .enter()
+                .append("circle")
+                .attr("cx", d => x(d["YoY Growth"]))
+                .attr("cy", d => y(d["2021 Median income"]))
+                .attr("r", 4)
+                .style("fill", d => color(d["Urban/Rural"]))
+
+            // Axis labels
+            svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth");
+            svg.append("text").attr("text-anchor", "end").attr("transform", "rotate(-90)").attr("y", -margin.left+20).attr("x", -margin.top).text("Median Income");
+
+            // Axes
+            svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
+            svg.append("g").call(d3.axisLeft(y));
+
+            // Legend
+            var legend = svg.selectAll(".legend")
+                .data(color.domain())
+                .enter().append("g")
+                .attr("class", "legend")
+                .attr("transform", (d, i) => "translate(0," + i * 20 + ")");
+
+            // Draw legend colored rectangles
+            legend.append("rect")
+                .attr("x", width - 18)
+                .attr("width", 18)
+                .attr("height", 18)
+                .style("fill", color);
+
+            // Draw legend text
+            legend.append("text")
+                .attr("x", width - 24)
+                .attr("y", 9)
+                .attr("dy", ".35em")
+                .style("text-anchor", "end")
+                .text(d => d);
+        });
+    </script>
 </body>
 </html>
+
