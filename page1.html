@@ -67,20 +67,20 @@
           .attr("transform", "translate(0," + y(35000) + ")")
           .call(d3.axisBottom(x));
 
-     // Add X-Axis label
-              svg.append("text")
-            .attr("text-anchor", "end")
-            .attr("x", width)
-            .attr("y", height + margin.bottom / 2)
-            .text("Year-Over-Year Growth (Percentage)");
-
-        // Add Y-Axis label
+        // Add X axis label
         svg.append("text")
             .attr("text-anchor", "end")
-            .attr("y", -margin.left + 20)  // Moved the label a bit more to the left
-            .attr("dy", ".75em")
+            .attr("x", width)
+            .attr("y", height + margin.top + 20)
+            .text("Year-Over-Year Growth (Percentage)");
+
+        // Add Y axis label
+        svg.append("text")
+            .attr("text-anchor", "end")
             .attr("transform", "rotate(-90)")
-            .text("Median Income (USD)");
+            .attr("y", -margin.left+20)
+            .attr("x", -margin.top)
+            .text("Median Income (USD)")  
 
         //plot data
           svg.selectAll("dot")
