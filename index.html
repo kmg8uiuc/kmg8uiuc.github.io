@@ -67,7 +67,7 @@
             .attr("text-anchor", "end")
             .attr("x", width)
             .attr("y", height + margin.bottom / 2)
-            .text("Year-Over-Year Growth");
+            .text("Year-Over-Year Growth (Percentage)");
 
         // Add Y-Axis label
         svg.append("text")
@@ -75,7 +75,7 @@
             .attr("y", -margin.left + 20)  // Moved the label a bit more to the left
             .attr("dy", ".75em")
             .attr("transform", "rotate(-90)")
-            .text("Median Income");
+            .text("Median Income (USD)");
 
         // Add dots
         svg.append('g')
