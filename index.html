@@ -63,18 +63,19 @@
 
         // Add X-Axis label
         svg.append("text")
-            .attr("text-anchor", "end")
-            .attr("x", width)
-            .attr("y", height - 6)
-            .text("Year-Over-Year Growth");
+        .attr("text-anchor", "end")
+        .attr("x", width)
+        .attr("y", height + margin.top + 20)
+        .text("Year-Over-Year Growth");
 
         // Add Y-Axis label
         svg.append("text")
-            .attr("text-anchor", "end")
-            .attr("y", 6)
-            .attr("dy", ".75em")
-            .attr("transform", "rotate(-90)")
-            .text("Median Income");
+        .attr("text-anchor", "end")
+        .attr("y", -margin.left + 20)
+        .attr("dy", ".75em")
+        .attr("transform", "rotate(-90)")
+        .text("Median Income");
+
 
             // Add dots
             svg.selectAll("dot")
