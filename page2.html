@@ -68,9 +68,10 @@
                })
               // Tooltip
               .on("mouseover", function(event, d) {
-                  tooltip.style("visibility", "visible")
-                      .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
+                tooltip.style("visibility", "visible")
+                .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
                 })
+                
              .on("mousemove", function(event) {
                    tooltip.style("top", (event.pageY-10)+"px")
                       .style("left",(event.pageX+10)+"px");
