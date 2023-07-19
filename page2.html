@@ -41,11 +41,6 @@
         d.DensityGroup = d.Density > 113 ? 'Urban' : 'Rural';
         });
 
-            // Create color scale
-            const color = d3.scaleOrdinal()
-                .domain(["Urban", "Rural"])
-                .range(["orange", "green"]);
-
             // Axes and scales
             const x = d3.scaleLinear().domain([d3.min(incomeData, d => d["YoY Growth"]), d3.max(incomeData, d => d["YoY Growth"])]).nice().range([0, width]);
             const y = d3.scaleLinear().domain([35000, d3.max(incomeData, d => d["2021 Median income"])]).nice().range([height, 0]);
