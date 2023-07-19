@@ -21,8 +21,9 @@
             .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
         // Tooltip
-        var tooltip = d3.select("body").append("div").attr("class", "toolTip");
-
+        var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
         // Read the data
         Promise.all([
          d3.csv("State_Income_Clean.csv"),
