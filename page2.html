@@ -20,6 +20,9 @@
             .append("g")
             .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+        // Tooltip
+        var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+
         // Read the data
         Promise.all([
          d3.csv("State_Income_Clean.csv"),
@@ -35,12 +38,11 @@
            });
 
         incomeData.forEach(function(d) {
-            d.Density = popLookup[d.State] || 0;
-            d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
-            d['YoY Growth'] = +d['YoY Growth'].replace('%', '');
-             d.DensityGroup = d.Density > 113 ? 'Urban' : 'Rural';
+        d.Density = popLookup[d.State] || 0;
+        d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
+        d['YoY Growth'] = +d['YoY Growth'].replace('%', '');
+        d.DensityGroup = d.Density > 113 ? 'Urban' : 'Rural';
         });
-
 
             // Create color scale
             const color = d3.scaleOrdinal()
@@ -59,10 +61,19 @@
               .attr("cx", function (d) { return x(d['YoY Growth']); } )
               .attr("cy", function (d) { return y(d['2021 Median income']); } )
               .attr("r", 3.5)
-               .style("fill", function(d) { 
+              .style("fill", function(d) { 
                    if (d.DensityGroup == "Urban") { return "orange"; } 
                   else if (d.DensityGroup == "Rural") { return "green"; }
-               });
+               })
+              // Tooltip
+              .on("mousemove", function(event,d){
+                tooltip
+                  .style("left", event.pageX + 10 + "px")
+                  .style("top", event.pageY - 20 + "px")
+                  .style("display", "inline-block")
+                  .html(`State: ${d.State}<br>2021 Median income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}%<br>Density Group: ${d.DensityGroup}`);
+              })
+              .on("mouseout", function(d){ tooltip.style("display", "none");});
 
             // Axis labels
             svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth");
@@ -94,7 +105,8 @@
                 .style("text-anchor", "end")
                 .text(d => d);
         });
-    </script> 
+    </script>
 </body>
 </html>
+
 
