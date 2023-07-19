@@ -8,9 +8,9 @@
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script>
         // Set dimensions and margins
-        const margin = {top: 10, right: 30, bottom: 30, left: 60},
-            width = 800 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
+        var margin = {top: 20, right: 20, bottom: 60, left: 120};
+        var width = 960 - margin.left - margin.right;
+        var height = 500 - margin.top - margin.bottom;
 
         // Append SVG object
         var svg = d3.select("body")
