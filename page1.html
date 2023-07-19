@@ -9,19 +9,6 @@
       top: 20px;
       right: 20px;
     }
-    /* Add this style for tooltip */
-    .tooltip {
-      position: absolute;
-      text-align: center;
-      width: 120px;
-      height: 45px;
-      padding: 2px;
-      font: 12px sans-serif;
-      background: lightsteelblue;
-      border: 0px;
-      border-radius: 8px;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
@@ -54,11 +41,6 @@
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    // Tooltip
-    var tooltip = d3.select("body").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
-
     // Load both CSV files and wait until they are both loaded before proceeding
     Promise.all([
       d3.csv('State_Income_Clean.csv'),
@@ -66,6 +48,9 @@
     ]).then(function(values) {
       var incomeData = values[0];
       var partyData = values[1];
+      var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
       // Convert party data to a dictionary for easy lookup
       var partyLookup = {};
@@ -75,10 +60,10 @@
 
       // Parse and prepare the income data
       incomeData.forEach(d => {
-  d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
-  d['YoY Growth'] = +d['YoY Growth'].slice(0, -1);
-  d.Party = partyLookup[d.State] ? partyLookup[d.State].trim() : null;  // Add party data and remove potential white spaces
-});
+        d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
+        d['YoY Growth'] = +d['YoY Growth'].slice(0, -1);
+        d.Party = partyLookup[d.State];  // Add party data
+      });
 
       var x = d3.scaleLinear()
           .domain([d3.min(incomeData, d => d['YoY Growth']), d3.max(incomeData, d => d['YoY Growth'])])
@@ -116,60 +101,58 @@
           .attr("x", -margin.top)
           .text("Median Income (USD)")
 
-// Function to plot data
-function plotData(filterParty) {
-  // First, remove the existing circles
-  svg.selectAll("circle").remove();
+      // Function to plot data
+      function plotData(filterParty) {
+        // First, remove the existing circles
+        svg.selectAll("circle").remove();
 
-  var filteredData = incomeData;
+        var filteredData = incomeData;
 
-  if (filterParty !== "all") {
-    filteredData = incomeData.filter(d => d.Party === filterParty);
-  }
+        if (filterParty !== "all") {
+          filteredData = incomeData.filter(d => d.Party === filterParty);
+        }
 
         //plot data
         svg.selectAll("dot")
-          .data(filteredData) // Change this line
-          .enter().append("circle")
-          .attr("cx", function(d) { return x(d['YoY Growth']); })
-          .attr("cy", function(d) { return y(d['2021 Median income']); })
-          .attr("r", 5)
-          .style("fill", function(d) { return color(d.Party); })
-          .style("stroke", function(d) { 
-            // Add stroke for selected states
-            var highlightStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
-            return highlightStates.includes(d.State) ? "lime" : "none"; 
-          })
-          .style("stroke-width", function(d) {
-            var highlightStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
-            return highlightStates.includes(d.State) ? 2 : 0; 
-          })
+  .data(filteredData) // Change this line
+  .enter().append("circle")
+  .attr("cx", function(d) { return x(d['YoY Growth']); })
+  .attr("cy", function(d) { return y(d['2021 Median income']); })
+  .attr("r", 5)
+  .style("fill", function(d) { return color(d.Party); })
+  .style("stroke", function(d) { 
+      // Add stroke for selected states
+      var highlightStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
+      return highlightStates.includes(d.State) ? "lime" : "none"; 
+  })
+  .style("stroke-width", function(d) {
+      var highlightStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
+      return highlightStates.includes(d.State) ? 2 : 0; 
+  })
           .on("mouseover", function(event, d) {
-            tooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-            tooltip.html("State: " + d.State + "<br/>" + "Median Income: " + d['2021 Median income'] + "<br/>" + "YoY Growth: " + d['YoY Growth'] + "%")
-                .style("left", (event.pageX + 5) + "px")
-                .style("top", (event.pageY - 28) + "px");
-            })
-          .on("mouseout", function(d) {
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
-            });
-
+                tooltip.style("visibility", "visible")
+                    .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
+              })
+           .on("mousemove", function(event) {
+                 tooltip.style("top", (event.pageY-10)+"px")
+                    .style("left",(event.pageX+10)+"px");
+           })
+           .on("mouseout", function() {
+               tooltip.style("visibility", "hidden");
+           });
       }
 
       // Initially plot all data
       plotData("all");
 
-    // React to changes in the dropdown menu
-    d3.select("#partyFilter").on("change", function() {
-        plotData(this.value.trim());  // Remove potential white spaces
-    }); 
+      // React to changes in the dropdown menu
+      d3.select("#partyFilter").on("change", function() {
+        plotData(this.value);
+      });
     });
   </script>
-  <button class="button" onclick="location.href='index.html'">Go Back</button>
+  <button class="button" onclick="location.href='index.html'">Previous</button>
+  <button class="button" onclick="location.href='page2.html'">Next</button>
 </body>
 </html>
 
