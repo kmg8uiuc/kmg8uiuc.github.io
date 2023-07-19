@@ -110,6 +110,8 @@
           .attr("cy", function(d) { return y(d['2021 Median income']); })
           .attr("r", 5)
           .style("fill", function(d) { return color(d.Party); })
+          .style("stroke", function(d) { return ["California", "Texas", "New York", "Florida"].includes(d.State) ? "lime" : "none"; })
+          .style("stroke-width", 2)
           .on("mouseover", function(event, d) {
                 tooltip.style("visibility", "visible")
                     .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
