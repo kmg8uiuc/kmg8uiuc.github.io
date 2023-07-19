@@ -68,8 +68,8 @@
               // Tooltip
               .on("mousemove", function(event,d){
                 tooltip
-                  .style("left", event.pageX + 10 + "px")
-                  .style("top", event.pageY - 20 + "px")
+                  .style("left", (d3.pointer(event)[0]+70) + "px") 
+                  .style("top", (d3.pointer(event)[1]) + "px")
                   .style("display", "inline-block")
                   .html(`State: ${d.State}<br>2021 Median income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}%<br>Density Group: ${d.DensityGroup}`);
               })
@@ -108,5 +108,3 @@
     </script>
 </body>
 </html>
-
-
