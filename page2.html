@@ -66,14 +66,17 @@
                   else if (d.DensityGroup == "Rural") { return "green"; }
                })
               // Tooltip
-              .on("mousemove", function(event,d){
-                tooltip
-                  .style("left", (d3.pointer(event)[0]+70) + "px") 
-                  .style("top", (d3.pointer(event)[1]) + "px")
-                  .style("display", "inline-block")
-                  .html(`State: ${d.State}<br>2021 Median income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}%<br>Density Group: ${d.DensityGroup}`);
-              })
-              .on("mouseout", function(d){ tooltip.style("display", "none");});
+              .on("mouseover", function(event, d) {
+                  tooltip.style("visibility", "visible")
+                      .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
+                })
+             .on("mousemove", function(event) {
+                   tooltip.style("top", (event.pageY-10)+"px")
+                      .style("left",(event.pageX+10)+"px");
+             })
+             .on("mouseout", function() {
+                 tooltip.style("visibility", "hidden");
+             });
 
             // Axis labels
             svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth");
