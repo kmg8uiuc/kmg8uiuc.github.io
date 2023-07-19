@@ -108,7 +108,19 @@
                 .attr("dy", ".35em")
                 .style("text-anchor", "end")
                 .text(d => d);
-        });
+
+        // Create a div for the tooltip
+        var tooltip = d3.select("body")
+                .append("div")
+                .style("position", "absolute")
+                .style("z-index", "10")
+                .style("visibility", "hidden")
+                .style("background", "#ffffff")
+                .style("border", "solid")
+                .style("border-width", "1px")
+                .style("border-radius", "5px")
+                .style("padding", "10px");
+            });
     </script>
     <button class="button" onclick="location.href='page1.html'">Previous</button>
 </body>
