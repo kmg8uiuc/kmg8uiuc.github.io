@@ -2,6 +2,14 @@
 <head>
   <title>Income by State With Political Party</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Add this style block */
+    #filter-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+  </style>
 </head>
 <body>
   <h1>Income by State With Political Party</h1>
@@ -11,12 +19,14 @@
   </ul>
 
   <!-- Dropdown menu for party selection -->
-  <label for="partyFilter">Filter by Party:</label>
-  <select id="partyFilter">
-    <option value="all">All</option>
-    <option value="Democratic">Democratic</option>
-    <option value="Republican">Republican</option>
-  </select>
+  <div id="filter-container">
+    <label for="partyFilter">Filter by Party:</label>
+    <select id="partyFilter">
+      <option value="all">All</option>
+      <option value="Democratic">Democratic</option>
+      <option value="Republican">Republican</option>
+    </select>
+  </div>
 
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script>
