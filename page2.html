@@ -20,26 +20,26 @@
             .append("g")
             .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+        // Read the data
         Promise.all([
-            d3.csv("State_Income_Clean.csv"),
-            d3.csv("State_Pop_Clean.csv")
-        ]).then(([incomeData, popData]) => {
-            const popLookup = {};
-            popData.forEach(d => {
-                d["Population Density"] = +d["Population Density"];
-                popLookup[d.State] = d["Population Density"];
-            });
+         d3.csv("State_Income_Clean.csv"),
+         d3.csv("State_Pop_Clean.csv")
+        ]).then(function(files) {
+           // Prepare and merge data
+           let incomeData = files[0];
+           let popData = files[1];
+           let popLookup = {};
 
-            // Calculate median population density
-            const popDensities = popData.map(d => d["Population Density"]);
-            const medianPopDensity = d3.median(popDensities);
+           popData.forEach(function(d) {
+           popLookup[d.State] = +d['Population Density'];
+           });
 
-            // Add 'Urban/Rural' column
-            incomeData.forEach(d => {
-                d["Urban/Rural"] = popLookup[d.state] > medianPopDensity ? "Urban" : "Rural";
-                d["2021 Median income"] = +d["2021 Median income"].replace(/,/g, '');
-                d["YoY Growth"] = +d["YoY Growth"].replace(/%/g, '');
-            });
+        incomeData.forEach(function(d) {
+        d.Density = popLookup[d.state] || 0;
+        d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
+        d['YoY Growth'] = +d['YoY Growth'].replace('%', '');
+        d.DensityGroup = d.Density > 113 ? 'Urban' : 'Rural';
+        });
 
             // Create color scale
             const color = d3.scaleOrdinal()
@@ -50,16 +50,18 @@
             const x = d3.scaleLinear().domain([d3.min(incomeData, d => d["YoY Growth"]), d3.max(incomeData, d => d["YoY Growth"])]).nice().range([0, width]);
             const y = d3.scaleLinear().domain([35000, d3.max(incomeData, d => d["2021 Median income"])]).nice().range([height, 0]);
 
-            // Add dots
+           // Add dots
             svg.append('g')
-                .selectAll("dot")
-                .data(incomeData)
-                .enter()
-                .append("circle")
-                .attr("cx", d => x(d["YoY Growth"]))
-                .attr("cy", d => y(d["2021 Median income"]))
-                .attr("r", 4)
-                .style("fill", d => color(d["Urban/Rural"]))
+             .selectAll("dot")
+              .data(incomeData)
+              .join("circle")
+              .attr("cx", function (d) { return x(d['YoY Growth']); } )
+              .attr("cy", function (d) { return y(d['2021 Median income']); } )
+              .attr("r", 3.5)
+               .style("fill", function(d) { 
+                   if (d.DensityGroup == "Urban") { return "orange"; } 
+                  else if (d.DensityGroup == "Rural") { return "green"; }
+               });
 
             // Axis labels
             svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth");
