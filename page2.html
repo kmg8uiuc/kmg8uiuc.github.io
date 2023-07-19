@@ -67,7 +67,7 @@
    .attr("cx", function (d) { return x(d['YoY Growth']); } )
    .attr("cy", function (d) { return y(d['2021 Median income']); } )
    .attr("r", 5)
-   .attr("stroke", function(d) { return highlightedStates.includes(d.State) ? "black" : "none"; })
+   .attr("stroke", function(d) { return highlightedStates.includes(d.State) ? "lime" : "none"; })
    .attr("stroke-width", function(d) { return highlightedStates.includes(d.State) ? 2 : 0; })
    .style("fill", function(d) { 
        if (d.DensityGroup == "Urban") { return "orange"; } 
