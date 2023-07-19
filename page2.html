@@ -53,36 +53,38 @@
             const color = d3.scaleOrdinal()
                 .domain(["Urban", "Rural"])
                 .range(["orange", "green"]);
+                
+            var highlightedStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
 
             // Axes and scales
             const x = d3.scaleLinear().domain([d3.min(incomeData, d => d["YoY Growth"]), d3.max(incomeData, d => d["YoY Growth"])]).nice().range([0, width]);
             const y = d3.scaleLinear().domain([35000, d3.max(incomeData, d => d["2021 Median income"])]).nice().range([height, 0]);
 
-           // Add dots
             svg.append('g')
              .selectAll("dot")
-              .data(incomeData)
-              .join("circle")
-              .attr("cx", function (d) { return x(d['YoY Growth']); } )
-              .attr("cy", function (d) { return y(d['2021 Median income']); } )
-              .attr("r", 5)
-              .style("fill", function(d) { 
-                   if (d.DensityGroup == "Urban") { return "orange"; } 
-                  else if (d.DensityGroup == "Rural") { return "green"; }
-               })
-              // Tooltip
-              .on("mouseover", function(event, d) {
-                tooltip.style("visibility", "visible")
-                .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
-                })
-                
-             .on("mousemove", function(event) {
-                   tooltip.style("top", (event.pageY-10)+"px")
-                      .style("left",(event.pageX+10)+"px");
-             })
-             .on("mouseout", function() {
-                 tooltip.style("visibility", "hidden");
-             });
+   .data(incomeData)
+   .join("circle")
+   .attr("cx", function (d) { return x(d['YoY Growth']); } )
+   .attr("cy", function (d) { return y(d['2021 Median income']); } )
+   .attr("r", 5)
+   .attr("stroke", function(d) { return highlightedStates.includes(d.State) ? "black" : "none"; })
+   .attr("stroke-width", function(d) { return highlightedStates.includes(d.State) ? 2 : 0; })
+   .style("fill", function(d) { 
+       if (d.DensityGroup == "Urban") { return "orange"; } 
+       else if (d.DensityGroup == "Rural") { return "green"; }
+   })
+   .on("mouseover", function(event, d) {
+       tooltip.style("visibility", "visible")
+           .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
+   })
+   .on("mousemove", function(event) {
+       tooltip.style("top", (event.pageY-10)+"px")
+           .style("left",(event.pageX+10)+"px");
+   })
+   .on("mouseout", function() {
+       tooltip.style("visibility", "hidden");
+   });
+
 
             // Axis labels
             svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth (Percentage)");
