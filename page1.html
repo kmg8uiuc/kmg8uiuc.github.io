@@ -6,8 +6,8 @@
 <body>
   <h1>Income by State With Political Party</h1>
   <ul>
-      <li>This scene labels the data points blue if the govenor of that state is Democratic or red if the govenor of that state is Republican.</li>
-      <li>As you can see there doesn't seem to be a coorelation between the top growing states and party policy.</li>
+      <li>This scene labels the data points blue if the governor of that state is Democratic or red if the governor of that state is Republican.</li>
+      <li>As you can see there doesn't seem to be a correlation between the top growing states and party policy.</li>
   </ul>
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script>
@@ -21,6 +21,9 @@
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Add the highlighted states here
+    var highlightedStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
 
     // Load both CSV files and wait until they are both loaded before proceeding
     Promise.all([
@@ -89,6 +92,8 @@
             .attr("cx", function(d) { return x(d['YoY Growth']); })
             .attr("cy", function(d) { return y(d['2021 Median income']); })
             .attr("r", 5)
+            .attr("stroke", function(d) { return highlightedStates.includes(d.State) ? "lime" : "none"; }) // Added stroke color here
+            .attr("stroke-width", function(d) { return highlightedStates.includes(d.State) ? 2 : 0; }) // Added stroke width here
             .style("fill", function(d) { return color(d.Party); })
             .on("mouseover", function(event, d) {
                   tooltip.style("visibility", "visible")
