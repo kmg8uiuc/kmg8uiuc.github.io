@@ -41,6 +41,11 @@
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        // Tooltip
+        var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+        
     // Load both CSV files and wait until they are both loaded before proceeding
     Promise.all([
       d3.csv('State_Income_Clean.csv'),
@@ -149,6 +154,19 @@
       d3.select("#partyFilter").on("change", function() {
         plotData(this.value);
       });
+
+            // Create a div for the tooltip
+            var tooltip = d3.select("body")
+                .append("div")
+                .style("position", "absolute")
+                .style("z-index", "10")
+                .style("visibility", "hidden")
+                .style("background", "#ffffff")
+                .style("border", "solid")
+                .style("border-width", "1px")
+                .style("border-radius", "5px")
+                .style("padding", "10px");
+
     });
   </script>
   <button class="button" onclick="location.href='index.html'">Previous</button>
