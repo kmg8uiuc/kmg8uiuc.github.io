@@ -80,12 +80,16 @@
              });
 
             // Axis labels
-            svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth");
-            svg.append("text").attr("text-anchor", "end").attr("transform", "rotate(-90)").attr("y", -margin.left+20).attr("x", -margin.top).text("Median Income");
+            svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth (Percentage)");
+            svg.append("text").attr("text-anchor", "end").attr("transform", "rotate(-90)").attr("y", -margin.left+20).attr("x", -margin.top).text("Median Income (USD)");
 
-            // Axes
-            svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
-            svg.append("g").call(d3.axisLeft(y));
+            svg.append("g")
+                .attr("transform", "translate(" + x(0) + ",0)")
+                .call(d3.axisLeft(y));
+
+            svg.append("g")
+                .attr("transform", "translate(0," + y(35000) + ")")
+                .call(d3.axisBottom(x));
 
             // Legend
             var legend = svg.selectAll(".legend")
