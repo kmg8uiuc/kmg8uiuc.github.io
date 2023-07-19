@@ -61,7 +61,7 @@
               .join("circle")
               .attr("cx", function (d) { return x(d['YoY Growth']); } )
               .attr("cy", function (d) { return y(d['2021 Median income']); } )
-              .attr("r", 3.5)
+              .attr("r", 5)
               .style("fill", function(d) { 
                    if (d.DensityGroup == "Urban") { return "orange"; } 
                   else if (d.DensityGroup == "Rural") { return "green"; }
