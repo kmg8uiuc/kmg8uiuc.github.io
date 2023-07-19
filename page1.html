@@ -114,14 +114,21 @@
 
         //plot data
         svg.selectAll("dot")
-          .data(filteredData)
-          .enter().append("circle")
-          .attr("cx", function(d) { return x(d['YoY Growth']); })
-          .attr("cy", function(d) { return y(d['2021 Median income']); })
-          .attr("r", 5)
-          .style("fill", function(d) { return color(d.Party); })
-          .style("stroke", function(d) { return ["California", "Texas", "New York", "Florida"].includes(d.State) ? "lime" : "none"; })
-          .style("stroke-width", 2)
+  .data(incomeData)
+  .enter().append("circle")
+  .attr("cx", function(d) { return x(d['YoY Growth']); })
+  .attr("cy", function(d) { return y(d['2021 Median income']); })
+  .attr("r", 5)
+  .style("fill", function(d) { return color(d.Party); })
+  .style("stroke", function(d) { 
+      // Add stroke for selected states
+      var highlightStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
+      return highlightStates.includes(d.State) ? "lime" : "none"; 
+  })
+  .style("stroke-width", function(d) {
+      var highlightStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
+      return highlightStates.includes(d.State) ? 2 : 0; 
+  })
           .on("mouseover", function(event, d) {
                 tooltip.style("visibility", "visible")
                     .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
