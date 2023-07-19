@@ -45,7 +45,7 @@
         var tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
-        
+
     // Load both CSV files and wait until they are both loaded before proceeding
     Promise.all([
       d3.csv('State_Income_Clean.csv'),
@@ -60,7 +60,7 @@
       // Convert party data to a dictionary for easy lookup
       var partyLookup = {};
       partyData.forEach(function(d) {
-        partyLookup[d.State] = d.Party;
+        partyLookup[d.State] = d.Party.trim(); 
       });
 
       // Parse and prepare the income data
@@ -152,7 +152,7 @@
 
       // React to changes in the dropdown menu
       d3.select("#partyFilter").on("change", function() {
-        plotData(this.value);
+        plotData(this.value.trim()); 
       });
 
             // Create a div for the tooltip
