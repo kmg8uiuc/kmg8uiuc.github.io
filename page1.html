@@ -75,10 +75,10 @@
 
       // Parse and prepare the income data
       incomeData.forEach(d => {
-        d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
-        d['YoY Growth'] = +d['YoY Growth'].slice(0, -1);
-        d.Party = partyLookup[d.State];  // Add party data
-      });
+  d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
+  d['YoY Growth'] = +d['YoY Growth'].slice(0, -1);
+  d.Party = partyLookup[d.State] ? partyLookup[d.State].trim() : null;  // Add party data and remove potential white spaces
+});
 
       var x = d3.scaleLinear()
           .domain([d3.min(incomeData, d => d['YoY Growth']), d3.max(incomeData, d => d['YoY Growth'])])
@@ -116,16 +116,16 @@
           .attr("x", -margin.top)
           .text("Median Income (USD)")
 
-      // Function to plot data
-      function plotData(filterParty) {
-        // First, remove the existing circles
-        svg.selectAll("circle").remove();
+// Function to plot data
+function plotData(filterParty) {
+  // First, remove the existing circles
+  svg.selectAll("circle").remove();
 
-        var filteredData = incomeData;
+  var filteredData = incomeData;
 
-        if (filterParty !== "all") {
-          filteredData = incomeData.filter(d => d.Party === filterParty);
-        }
+  if (filterParty !== "all") {
+    filteredData = incomeData.filter(d => d.Party === filterParty);
+  }
 
         //plot data
         svg.selectAll("dot")
@@ -163,10 +163,10 @@
       // Initially plot all data
       plotData("all");
 
-      // React to changes in the dropdown menu
-      d3.select("#partyFilter").on("change", function() {
-        plotData(this.value);
-      });
+    // React to changes in the dropdown menu
+    d3.select("#partyFilter").on("change", function() {
+        plotData(this.value.trim());  // Remove potential white spaces
+    }); 
     });
   </script>
   <button class="button" onclick="location.href='index.html'">Go Back</button>
