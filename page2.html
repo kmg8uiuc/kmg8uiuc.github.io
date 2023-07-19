@@ -59,30 +59,45 @@
             const y = d3.scaleLinear().domain([35000, d3.max(incomeData, d => d["2021 Median income"])]).nice().range([height, 0]);
 
            // Add dots
-            svg.append('g')
-             .selectAll("dot")
-              .data(incomeData)
-              .join("circle")
-              .attr("cx", function (d) { return x(d['YoY Growth']); } )
-              .attr("cy", function (d) { return y(d['2021 Median income']); } )
-              .attr("r", 5)
-              .style("fill", function(d) { 
-                   if (d.DensityGroup == "Urban") { return "orange"; } 
-                  else if (d.DensityGroup == "Rural") { return "green"; }
-               })
-              // Tooltip
-              .on("mouseover", function(event, d) {
-                tooltip.style("visibility", "visible")
-                .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
-                })
-                
-             .on("mousemove", function(event) {
-                   tooltip.style("top", (event.pageY-10)+"px")
-                      .style("left",(event.pageX+10)+"px");
-             })
-             .on("mouseout", function() {
-                 tooltip.style("visibility", "hidden");
-             });
+           svg.append('g')
+            .selectAll("dot")
+            .data(incomeData)
+            .join("circle")
+         .attr("class", function(d) { return d.State; })  // Add class with the state name to the dots
+         .attr("cx", function (d) { return x(d['YoY Growth']); } )
+            .attr("cy", function (d) { return y(d['2021 Median income']); } )
+            .attr("r", 5)
+            .style("fill", function(d) { 
+             if (d.DensityGroup == "Urban") { return "orange"; } 
+                 else if (d.DensityGroup == "Rural") { return "green"; }
+         })
+            .on("mouseover", function(event, d) {
+        tooltip.style("visibility", "visible")
+            .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
+            })
+            .on("mousemove", function(event) {
+        tooltip.style("top", (event.pageY-10)+"px")
+            .style("left",(event.pageX+10)+"px");
+            })
+            .on("mouseout", function() {
+                tooltip.style("visibility", "hidden");
+         });
+
+         // Display tooltips for specific states immediately after the page is loaded
+            setTimeout(function() {
+             const states = ['Idaho', 'Montana', 'Oklahoma', 'Vermont', 'Tennessee', 'Maine', 'Louisiana'];
+                states.forEach(state => {
+                 const dot = d3.selectAll(`circle.${state}`);
+                 if (!dot.empty()) {
+                        dot.each(function(d) {
+                         tooltip.style("visibility", "visible")
+                              .style("top", (d3.select(this).attr("cy")-10)+"px")
+                              .style("left",(d3.select(this).attr("cx")+10)+"px")
+                             .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
+                     });
+                    }
+                });
+            }, 1000);
 
             // Axis labels
             svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth (Percentage)");
