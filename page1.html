@@ -6,9 +6,18 @@
 <body>
   <h1>Income by State With Political Party</h1>
   <ul>
-      <li>This scene labels the data points blue if the governor of that state is Democratic or red if the governor of that state is Republican.</li>
-      <li>As you can see there doesn't seem to be a correlation between the top growing states and party policy.</li>
+    <li>This scene labels the data points blue if the governor of that state is Democratic or red if the governor of that state is Republican.</li>
+    <li>As you can see there doesn't seem to be a correlation between the top growing states and party policy.</li>
   </ul>
+
+  <!-- Dropdown menu for party selection -->
+  <label for="partyFilter">Filter by Party:</label>
+  <select id="partyFilter">
+    <option value="all">All</option>
+    <option value="Democratic">Democratic</option>
+    <option value="Republican">Republican</option>
+  </select>
+
   <script src="https://d3js.org/d3.v6.min.js"></script>
   <script>
     var margin = {top: 20, right: 20, bottom: 60, left: 120};
@@ -21,9 +30,6 @@
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    // Add the highlighted states here
-    var highlightedStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
 
     // Load both CSV files and wait until they are both loaded before proceeding
     Promise.all([
@@ -70,82 +76,64 @@
           .attr("transform", "translate(0," + y(35000) + ")")
           .call(d3.axisBottom(x));
 
-        // Add X axis label
-        svg.append("text")
-            .attr("text-anchor", "end")
-            .attr("x", width)
-            .attr("y", height + margin.top + 20)
-            .text("Year-Over-Year Growth (Percentage)");
+      // Add X axis label
+      svg.append("text")
+          .attr("text-anchor", "end")
+          .attr("x", width)
+          .attr("y", height + margin.top + 20)
+          .text("Year-Over-Year Growth (Percentage)");
 
-        // Add Y axis label
-        svg.append("text")
-            .attr("text-anchor", "end")
-            .attr("transform", "rotate(-90)")
-            .attr("y", -margin.left+20)
-            .attr("x", -margin.top)
-            .text("Median Income (USD)")  
+      // Add Y axis label
+      svg.append("text")
+          .attr("text-anchor", "end")
+          .attr("transform", "rotate(-90)")
+          .attr("y", -margin.left+20)
+          .attr("x", -margin.top)
+          .text("Median Income (USD)")
+
+      // Function to plot data
+      function plotData(filterParty) {
+        // First, remove the existing circles
+        svg.selectAll("circle").remove();
+
+        var filteredData = incomeData;
+
+        if (filterParty !== "all") {
+          filteredData = incomeData.filter(d => d.Party === filterParty);
+        }
 
         //plot data
-          svg.selectAll("dot")
-            .data(incomeData)
-            .enter().append("circle")
-            .attr("cx", function(d) { return x(d['YoY Growth']); })
-            .attr("cy", function(d) { return y(d['2021 Median income']); })
-            .attr("r", 5)
-            .attr("stroke", function(d) { return highlightedStates.includes(d.State) ? "lime" : "none"; }) // Added stroke color here
-            .attr("stroke-width", function(d) { return highlightedStates.includes(d.State) ? 2 : 0; }) // Added stroke width here
-            .style("fill", function(d) { return color(d.Party); })
-            .on("mouseover", function(event, d) {
-                  tooltip.style("visibility", "visible")
-                      .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
-                })
-             .on("mousemove", function(event) {
-                   tooltip.style("top", (event.pageY-10)+"px")
-                      .style("left",(event.pageX+10)+"px");
-             })
-             .on("mouseout", function() {
-                 tooltip.style("visibility", "hidden");
-             });
+        svg.selectAll("dot")
+          .data(filteredData)
+          .enter().append("circle")
+          .attr("cx", function(d) { return x(d['YoY Growth']); })
+          .attr("cy", function(d) { return y(d['2021 Median income']); })
+          .attr("r", 5)
+          .style("fill", function(d) { return color(d.Party); })
+          .on("mouseover", function(event, d) {
+                tooltip.style("visibility", "visible")
+                    .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
+              })
+           .on("mousemove", function(event) {
+                 tooltip.style("top", (event.pageY-10)+"px")
+                    .style("left",(event.pageX+10)+"px");
+           })
+           .on("mouseout", function() {
+               tooltip.style("visibility", "hidden");
+           });
+      }
 
-            // Create a div for the tooltip
-            var tooltip = d3.select("body")
-                .append("div")
-                .style("position", "absolute")
-                .style("z-index", "10")
-                .style("visibility", "hidden")
-                .style("background", "#ffffff")
-                .style("border", "solid")
-                .style("border-width", "1px")
-                .style("border-radius", "5px")
-                .style("padding", "10px");
-                
-             // Define the parties
-            var parties = ["Democratic", "Republican"];
+      // Initially plot all data
+      plotData("all");
 
-            // Add the legend
-            var legend = svg.selectAll(".legend")
-                .data(parties)
-                .enter().append("g")
-                .attr("class", "legend")
-                .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-            // Draw legend colored rectangles
-            legend.append("rect")
-                .attr("x", width - 18)
-                .attr("width", 18)
-                .attr("height", 18)
-                .style("fill", color);
-
-            // Draw legend text
-            legend.append("text")
-                .attr("x", width - 24)
-                .attr("y", 9)
-                .attr("dy", ".35em")
-                .style("text-anchor", "end")
-                .text(function(d) { return d; });
-            });
+      // React to changes in the dropdown menu
+      d3.select("#partyFilter").on("change", function() {
+        plotData(this.value);
+      });
+    });
   </script>
   <button class="button" onclick="location.href='index.html'">Previous</button>
   <button class="button" onclick="location.href='page2.html'">Next</button>
 </body>
 </html>
+
