@@ -3,13 +3,13 @@
   <title>Income by State With Political Party</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Add this style block */
     #filter-container {
       position: absolute;
       top: 20px;
       right: 20px;
     }
   </style>
+  
 </head>
 <body>
   <h1>Income by State With Political Party</h1>
@@ -171,46 +171,24 @@
     .domain(["Democratic", "Republican"])  // Set domain explicitly
     .range(["blue", "red"]);
 
-    // Draw legend colored rectangles
-    legend.append("rect")
-        .attr("x", width - 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style("fill", color);
+      // Define the legend
+      var legend = svg.selectAll(".legend")  // Append to the svg's g element
+          .data(color.domain())  // Use the domain of the color scale
+          .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(" + (width - 100) + "," + (20 * i) + ")"; });  // Position the legend elements
 
-    // Draw legend text
-    legend.append("text")
-        .attr("x", width - 24)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function(d) { return d;});
+      legend.append("rect")
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", color);
 
-// Color scale
-var color = d3.scaleOrdinal()
-    .domain(["Democratic", "Republican"])
-    .range(["blue", "red"]);
-
-// Define the legend
-var legend = d3.select("svg").selectAll(".legend")
-    .data(["Democratic", "Republican"])  // Hardcode the data here
-    .enter().append("g")
-    .attr("class", "legend")
-    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-legend.append("rect")
-    .attr("x", width - 18)
-    .attr("width", 18)
-    .attr("height", 18)
-    .style("fill", color);
-
-legend.append("text")
-    .attr("x", width - 24)
-    .attr("y", 9)
-    .attr("dy", ".35em")
-    .style("text-anchor", "end")
-    .text(function(d) { return d; });
-
+      legend.append("text")
+          .attr("x", 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "start")
+          .text(function(d) { return d; });   
 
     });
   </script>
