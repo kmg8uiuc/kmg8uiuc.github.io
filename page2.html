@@ -183,13 +183,13 @@ legend.append("rect")
   .attr("width", 18)
   .attr("height", 18)
   .style("fill", function(d) { 
-      return d === "High Growth States" ? "white" : color(d); 
+      return d === "High Growth" ? "white" : color(d); 
   })
   .style("stroke", function(d) {
-      return d === "High Growth States" ? "black" : "none";
+      return d === "High Growth" ? "black" : "none";
   })
   .style("stroke-width", function(d) {
-      return d === "High Growth States" ? 1 : 0;
+      return d === "High Growth" ? 1 : 0;
   });
 
 legend.append("text")
