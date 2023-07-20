@@ -101,18 +101,18 @@
                 else if (d.DensityGroup == "Rural") { return "green"; }
             })
             .on("mouseover", function(event, d) {
-                tooltip.transition()
-                    .duration(200)
-                    .style("opacity", .9);
-                tooltip.html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}%<br>Population Density: ${d.Density}`)
-                    .style("left", (d3.pointer(event)[0] + 30) + "px")
-                    .style("top", (d3.pointer(event)[1]) + "px");
-            })
-            .on("mouseout", function(d) {
-                tooltip.transition()
-                    .duration(500)
-                    .style("opacity", 0);
-            });
+                tooltip.style("visibility", "visible")
+                    .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}%<br>Population Density: ${d.Density}`);
+                })
+           .on("mousemove", function(event) {
+                 tooltip.style("top", (event.pageY-10)+"px")
+                    .style("left",(event.pageX+10)+"px");
+           })
+           .on("mouseout", function() {
+               tooltip.style("visibility", "hidden");
+           });
+
+
 
             svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth (Percentage)");
             svg.append("text").attr("text-anchor", "end").attr("transform", "rotate(-90)").attr("y", -margin.left+20).attr("x", -margin.top).text("Median Income (USD)");
