@@ -29,15 +29,12 @@
         <li>Feel free to hover over the various data points and you will get a tooltip to get more information about that state.</li>
     </ul>
     <div id="scatter-plot"></div>
-<!-- Adding Legend -->
-<svg id="legend" width="500" height="100">
-    <rect x="30" y="20" width="15" height="15" style="fill: none; stroke: black;"></rect>
-    <text x="50" y="35" font-size="15px">= High Growth</text>
-</svg>
+
     <script>
     var margin = {top: 20, right: 20, bottom: 60, left: 120};  // Further increased left margin
     var width = 960 - margin.left - margin.right;
     var height = 500 - margin.top - margin.bottom;
+
 
     // Append SVG and group
     var svg = d3.select("body")
@@ -128,6 +125,55 @@
                 .style("padding", "10px");
 
             });
+
+            var color = d3.scaleOrdinal()
+            .domain([""])  // Set domain explicitly
+            .range([""]);
+
+      // Define the legend
+      var legend = svg.selectAll(".legend")  // Append to the svg's g element
+          .data(color.domain())  // Use the domain of the color scale
+          .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(" + (width - 100) + "," + (20 * i) + ")"; });  // Position the legend elements
+
+      legend.append("rect")
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", color);
+
+      legend.append("text")
+          .attr("x", 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "start")
+          .text(function(d) { return d; });
+          var legendData = color.domain().concat(["High Growth"]);
+var legend = svg.selectAll(".legend")  // Append to the svg's g element
+  .data(legendData)  // Use the new legend data array
+  .enter().append("g")
+  .attr("class", "legend")
+  .attr("transform", function(d, i) { return "translate(" + (width - 100) + "," + (20 * i) + ")"; });  // Position the legend elements
+
+legend.append("rect")
+  .attr("width", 18)
+  .attr("height", 18)
+  .style("fill", function(d) { 
+      return d === "High Growth" ? "white" : color(d); 
+  })
+  .style("stroke", function(d) {
+      return d === "High Growth" ? "black" : "none";
+  })
+  .style("stroke-width", function(d) {
+      return d === "High Growth" ? 1 : 0;
+  });
+
+legend.append("text")
+  .attr("x", 24)
+  .attr("y", 9)
+  .attr("dy", ".35em")
+  .style("text-anchor", "start")
+  .text(function(d) { return d; }); 
         </script>
 
   <div id="button-container">
