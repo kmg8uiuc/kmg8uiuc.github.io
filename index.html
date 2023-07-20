@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>US Median Income Scatter Plot</title>
+    <title>State Income and Income Growth</title>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <style>
@@ -21,7 +21,7 @@
     </style>
 </head>
 <body>
-    <h1>US State Income and Income Growth</h1>
+    <h1>State Income and Income Growth</h1>
     <ul>
         <li>This is an interactive slideshow that explores which states have the highest income growth and what factors lead to that.</li>
         <li>Below is a plot of median income and median income growth. The median income is from 2021 and the growth is from 2020 to 2021 median incomes.</li>
@@ -128,7 +128,7 @@
 
             var color = d3.scaleOrdinal()
             .domain([""])  // Set domain explicitly
-            .range([""]);
+            .range(["white"]);
 
       // Define the legend
       var legend = svg.selectAll(".legend")  // Append to the svg's g element
