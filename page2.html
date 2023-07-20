@@ -3,6 +3,19 @@
     <title>Page 2 - Population Density</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
+<style>
+    #filter-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    #button-container {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+    }
+  </style>
 <body>
     <h1>Income by State - Rural vs Urban</h1>
     <ul>
@@ -44,7 +57,7 @@
             currentFilter = dropdown.options[dropdown.selectedIndex].value;
             drawChart();
         });
-        
+
             // Create a div for the tooltip
             var tooltip = d3.select("body")
                 .append("div")
@@ -157,5 +170,8 @@
                 .text(d => d);
         }
     </script>
+<div id="button-container">
+    <button class="button" onclick="location.href='page1.html'">Previous</button>
+  </div>
 </body>
 </html>
