@@ -53,14 +53,18 @@
             drawChart();
         });
 
+        // Declare incomeData and popData variables outside of Promise block to make them accessible in drawChart()
+        let incomeData = null;
+        let popData = null;
+
         // Read the data
         Promise.all([
          d3.csv("State_Income_Clean.csv"),
          d3.csv("State_Pop_Clean.csv")
         ]).then(function(files) {
            // Prepare and merge data
-           let incomeData = files[0];
-           let popData = files[1];
+           incomeData = files[0];
+           popData = files[1];
            let popLookup = {};
 
            popData.forEach(function(d) {
@@ -138,12 +142,12 @@
                 .attr("transform", "translate(0," + y(35000) + ")")
                 .call(d3.axisBottom(x));
 
-            // Legend
+            // Draw legend
             var legend = svg.selectAll(".legend")
                 .data(color.domain())
                 .enter().append("g")
                 .attr("class", "legend")
-                .attr("transform", (d, i) => "translate(0," + i * 20 + ")");
+                .attr("transform", (d, i) => `translate(0,${i * 20})`);
 
             // Draw legend colored rectangles
             legend.append("rect")
@@ -163,3 +167,4 @@
     </script>
 </body>
 </html>
+
