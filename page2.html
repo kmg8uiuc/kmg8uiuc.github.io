@@ -16,16 +16,14 @@
           <option value="Urban">Urban</option>
           <option value="Rural">Rural</option>
         </select>
-      </div>
+    </div>
       
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script>
-        // Set dimensions and margins
         var margin = {top: 20, right: 20, bottom: 60, left: 120};
         var width = 960 - margin.left - margin.right;
         var height = 500 - margin.top - margin.bottom;
 
-        // Append SVG object
         var svg = d3.select("body")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -33,36 +31,27 @@
             .append("g")
             .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-        // Tooltip
-        var tooltip = d3.select("body").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+        // Add a div inside the body for the tooltip to reside in.
+        var tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
 
-        // Create a variable to hold the current filter value. It's initially set to "all" 
         let currentFilter = "all";
-
-        // Get the dropdown element from the DOM
         var dropdown = document.getElementById("urbanRuralFilter");
 
-        // Add a change event handler to the dropdown
         dropdown.addEventListener("change", function() {
-            // Get the new selected option
             currentFilter = dropdown.options[dropdown.selectedIndex].value;
-
-            // Redraw the chart
             drawChart();
         });
 
-        // Declare incomeData and popData variables outside of Promise block to make them accessible in drawChart()
         let incomeData = null;
         let popData = null;
 
-        // Read the data
         Promise.all([
          d3.csv("State_Income_Clean.csv"),
          d3.csv("State_Pop_Clean.csv")
         ]).then(function(files) {
-           // Prepare and merge data
            incomeData = files[0];
            popData = files[1];
            let popLookup = {};
@@ -78,30 +67,23 @@
             d.DensityGroup = d.Density > 113 ? 'Urban' : 'Rural';
            });
 
-           // Call the drawChart function for the first time
            drawChart();
         });
 
-        // Put your chart-drawing code into a function so you can call it again whenever the filter changes
         function drawChart() {
-            // Clear the existing chart
             svg.selectAll("*").remove();
 
-            // Draw the chart with the filtered data
-            // Use the filter() function to filter the data based on the current value of the filter
             let filteredData = incomeData;
             if (currentFilter != "all") {
                 filteredData = incomeData.filter(d => d.DensityGroup == currentFilter);
             }
 
-            // Create color scale
             const color = d3.scaleOrdinal()
                 .domain(["Urban", "Rural"])
                 .range(["orange", "green"]);
-                
+
             var highlightedStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
 
-            // Axes and scales
             const x = d3.scaleLinear().domain([d3.min(filteredData, d => d["YoY Growth"]), d3.max(filteredData, d => d["YoY Growth"])]).nice().range([0, width]);
             const y = d3.scaleLinear().domain([35000, d3.max(filteredData, d => d["2021 Median income"])]).nice().range([height, 0]);
 
@@ -119,18 +101,19 @@
                 else if (d.DensityGroup == "Rural") { return "green"; }
             })
             .on("mouseover", function(event, d) {
-                tooltip.style("visibility", "visible")
-                    .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                tooltip.html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}%<br>Population Density: ${d.Density}`)
+                    .style("left", (d3.pointer(event)[0] + 30) + "px")
+                    .style("top", (d3.pointer(event)[1]) + "px");
             })
-            .on("mousemove", function(event) {
-                tooltip.style("top", (event.pageY-10)+"px")
-                    .style("left",(event.pageX+10)+"px");
-            })
-            .on("mouseout", function() {
-                tooltip.style("visibility", "hidden");
+            .on("mouseout", function(d) {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
             });
 
-            // Axis labels
             svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth (Percentage)");
             svg.append("text").attr("text-anchor", "end").attr("transform", "rotate(-90)").attr("y", -margin.left+20).attr("x", -margin.top).text("Median Income (USD)");
 
@@ -142,21 +125,18 @@
                 .attr("transform", "translate(0," + y(35000) + ")")
                 .call(d3.axisBottom(x));
 
-            // Draw legend
             var legend = svg.selectAll(".legend")
                 .data(color.domain())
                 .enter().append("g")
                 .attr("class", "legend")
                 .attr("transform", (d, i) => `translate(0,${i * 20})`);
 
-            // Draw legend colored rectangles
             legend.append("rect")
                 .attr("x", width - 18)
                 .attr("width", 18)
                 .attr("height", 18)
                 .style("fill", color);
 
-            // Draw legend text
             legend.append("text")
                 .attr("x", width - 24)
                 .attr("y", 9)
@@ -167,4 +147,3 @@
     </script>
 </body>
 </html>
-
