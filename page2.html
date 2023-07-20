@@ -171,6 +171,34 @@
                 .attr("dy", ".35em")
                 .style("text-anchor", "end")
                 .text(d => d);
+            // Define the legend
+var legendData = color.domain().concat(["High Growth States"]);
+var legend = svg.selectAll(".legend")  // Append to the svg's g element
+  .data(legendData)  // Use the new legend data array
+  .enter().append("g")
+  .attr("class", "legend")
+  .attr("transform", function(d, i) { return "translate(" + (width - 100) + "," + (20 * i) + ")"; });  // Position the legend elements
+
+legend.append("rect")
+  .attr("width", 18)
+  .attr("height", 18)
+  .style("fill", function(d) { 
+      return d === "High Growth States" ? "white" : color(d); 
+  })
+  .style("stroke", function(d) {
+      return d === "High Growth States" ? "black" : "none";
+  })
+  .style("stroke-width", function(d) {
+      return d === "High Growth States" ? 1 : 0;
+  });
+
+legend.append("text")
+  .attr("x", 24)
+  .attr("y", 9)
+  .attr("dy", ".35em")
+  .style("text-anchor", "start")
+  .text(function(d) { return d; }); 
+
         }
     </script>
 <div id="button-container">
