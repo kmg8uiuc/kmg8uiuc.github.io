@@ -17,7 +17,7 @@
           <option value="Rural">Rural</option>
         </select>
     </div>
-      
+    
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script>
         var margin = {top: 20, right: 20, bottom: 60, left: 120};
@@ -44,6 +44,18 @@
             currentFilter = dropdown.options[dropdown.selectedIndex].value;
             drawChart();
         });
+        
+            // Create a div for the tooltip
+            var tooltip = d3.select("body")
+                .append("div")
+                .style("position", "absolute")
+                .style("z-index", "10")
+                .style("visibility", "hidden")
+                .style("background", "#ffffff")
+                .style("border", "solid")
+                .style("border-width", "1px")
+                .style("border-radius", "5px")
+                .style("padding", "10px");
 
         let incomeData = null;
         let popData = null;
@@ -103,7 +115,7 @@
             .on("mouseover", function(event, d) {
                 tooltip.style("visibility", "visible")
                     .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}%<br>Population Density: ${d.Density}`);
-                })
+            })
            .on("mousemove", function(event) {
                  tooltip.style("top", (event.pageY-10)+"px")
                     .style("left",(event.pageX+10)+"px");
