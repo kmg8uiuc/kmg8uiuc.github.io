@@ -29,7 +29,10 @@
         <li>Feel free to hover over the various data points and you will get a tooltip to get more information about that state.</li>
     </ul>
     <div id="scatter-plot"></div>
-
+    <svg id="legend" width="500" height="100">
+        <circle cx="30" cy="30" r="6" style="fill: turquoise; stroke: black;"></circle>
+        <text x="40" y="35" font-size="15px">= High Growth</text>
+    </svg>
     <script>
     var margin = {top: 20, right: 20, bottom: 60, left: 120};  // Further increased left margin
     var width = 960 - margin.left - margin.right;
@@ -125,6 +128,7 @@
 
             });
         </script>
+
   <div id="button-container">
     <button class="button" onclick="location.href='page1.html'">Next</button>
   </div>
