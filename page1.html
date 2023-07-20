@@ -167,12 +167,9 @@
                 .style("border-radius", "5px")
                 .style("padding", "10px");
 
-    // Define legend
-    var legend = svg.selectAll(".legend")
-        .data(color.domain())
-        .enter().append("g")
-        .attr("class", "legend")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+    var color = d3.scaleOrdinal()
+    .domain(["Democratic", "Republican"])  // Set domain explicitly
+    .range(["blue", "red"]);
 
     // Draw legend colored rectangles
     legend.append("rect")
