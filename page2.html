@@ -172,7 +172,7 @@
                 .style("text-anchor", "end")
                 .text(d => d);
             // Define the legend
-var legendData = color.domain().concat(["High Growth States"]);
+var legendData = color.domain().concat(["High Growth"]);
 var legend = svg.selectAll(".legend")  // Append to the svg's g element
   .data(legendData)  // Use the new legend data array
   .enter().append("g")
@@ -190,14 +190,7 @@ legend.append("rect")
   })
   .style("stroke-width", function(d) {
       return d === "High Growth" ? 1 : 0;
-  });
-
-legend.append("text")
-  .attr("x", 24)
-  .attr("y", 9)
-  .attr("dy", ".35em")
-  .style("text-anchor", "start")
-  .text(function(d) { return d; }); 
+  }); 
 
         }
     </script>
