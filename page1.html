@@ -186,26 +186,31 @@
         .style("text-anchor", "end")
         .text(function(d) { return d;});
 
-    
-    // Create legend
-    var legend = svg.selectAll(".legend")
-        .data(["Democratic", "Republican"]) // Hard-coding the legend entries
-        .enter().append("g")
-        .attr("class", "legend")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+// Color scale
+var color = d3.scaleOrdinal()
+    .domain(["Democratic", "Republican"])
+    .range(["blue", "red"]);
 
-    legend.append("rect")
-        .attr("x", width - 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style("fill", color);
+// Define the legend
+var legend = d3.select("svg").selectAll(".legend")
+    .data(["Democratic", "Republican"])  // Hardcode the data here
+    .enter().append("g")
+    .attr("class", "legend")
+    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-    legend.append("text")
-        .attr("x", width - 24)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function(d) { return d; });
+legend.append("rect")
+    .attr("x", width - 18)
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", color);
+
+legend.append("text")
+    .attr("x", width - 24)
+    .attr("y", 9)
+    .attr("dy", ".35em")
+    .style("text-anchor", "end")
+    .text(function(d) { return d; });
+
 
     });
   </script>
