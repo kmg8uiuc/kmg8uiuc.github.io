@@ -1,138 +1,133 @@
 <!DOCTYPE html>
 <head>
-    <title>Page 2 - Population Density</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+  <title>Income by State With Area</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Add this style block */
+    #filter-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    /* Add this style block */
+    .button-container {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Income by State - Rural vs Urban</h1>
-    <ul>
-        <li>This scene labels the data points green if it is a rural state or yellow if it is a urban state.</li>
-        <li>As you can see rural states have more income growth.</li>
-    </ul>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
-    <script>
-        // Set dimensions and margins
-        var margin = {top: 20, right: 20, bottom: 60, left: 120};
-        var width = 960 - margin.left - margin.right;
-        var height = 500 - margin.top - margin.bottom;
+  <h1>Income by State With Area</h1>
+  <ul>
+    <li>This scene labels the data points blue if the area of that state is urban or red if the area of that state is rural.</li>
+    <li>As you can see there doesn't seem to be a correlation between the top growing states and area type.</li>
+  </ul>
 
-        // Append SVG object
-        var svg = d3.select("body")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+  <!-- Dropdown menu for area selection -->
+  <div id="filter-container">
+    <label for="areaFilter">Filter by Area:</label>
+    <select id="areaFilter">
+      <option value="all">All</option>
+      <option value="Urban">Urban</option>
+      <option value="Rural">Rural</option>
+    </select>
+  </div>
 
-        // Tooltip
-        var tooltip = d3.select("body").append("div")
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script>
+    var margin = {top: 20, right: 20, bottom: 60, left: 120};
+    var width = 960 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
+
+    var svg = d3.select("body")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
-        // Read the data
-        Promise.all([
-         d3.csv("State_Income_Clean.csv"),
-         d3.csv("State_Pop_Clean.csv")
-        ]).then(function(files) {
-           // Prepare and merge data
-           let incomeData = files[0];
-           let popData = files[1];
-           let popLookup = {};
 
-           popData.forEach(function(d) {
-           popLookup[d.State] = +d['Population Density'];
-           });
+    d3.csv('State_Income_Clean.csv', function(error, incomeData) {
+      if (error) throw error;
 
-        incomeData.forEach(function(d) {
-        d.Density = popLookup[d.State] || 0;
+      incomeData.forEach(d => {
         d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
-        d['YoY Growth'] = +d['YoY Growth'].replace('%', '');
-        d.DensityGroup = d.Density > 113 ? 'Urban' : 'Rural';
-        });
+        d['YoY Growth'] = +d['YoY Growth'].slice(0, -1);
+      });
 
-            // Create color scale
-            const color = d3.scaleOrdinal()
-                .domain(["Urban", "Rural"])
-                .range(["orange", "green"]);
-                
-            var highlightedStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
+      var x = d3.scaleLinear()
+          .domain([d3.min(incomeData, d => d['YoY Growth']), d3.max(incomeData, d => d['YoY Growth'])])
+          .range([0, width]);
 
-            // Axes and scales
-            const x = d3.scaleLinear().domain([d3.min(incomeData, d => d["YoY Growth"]), d3.max(incomeData, d => d["YoY Growth"])]).nice().range([0, width]);
-            const y = d3.scaleLinear().domain([35000, d3.max(incomeData, d => d["2021 Median income"])]).nice().range([height, 0]);
+      var y = d3.scaleLinear()
+          .domain([35000, d3.max(incomeData, d => d['2021 Median income'])])
+          .range([height, 0]);
 
-            svg.append('g')
-             .selectAll("dot")
-   .data(incomeData)
-   .join("circle")
-   .attr("cx", function (d) { return x(d['YoY Growth']); } )
-   .attr("cy", function (d) { return y(d['2021 Median income']); } )
-   .attr("r", 5)
-   .attr("stroke", function(d) { return highlightedStates.includes(d.State) ? "lime" : "none"; })
-   .attr("stroke-width", function(d) { return highlightedStates.includes(d.State) ? 2 : 0; })
-   .style("fill", function(d) { 
-       if (d.DensityGroup == "Urban") { return "orange"; } 
-       else if (d.DensityGroup == "Rural") { return "green"; }
-   })
-   .on("mouseover", function(event, d) {
-       tooltip.style("visibility", "visible")
-           .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
-   })
-   .on("mousemove", function(event) {
-       tooltip.style("top", (event.pageY-10)+"px")
-           .style("left",(event.pageX+10)+"px");
-   })
-   .on("mouseout", function() {
-       tooltip.style("visibility", "hidden");
-   });
+      var color = d3.scaleOrdinal()
+          .domain(["Urban", "Rural"])
+          .range(["blue", "red"]);
 
+      svg.append("g")
+          .attr("transform", "translate(0," + y(35000) + ")")
+          .call(d3.axisBottom(x));
 
-            // Axis labels
-            svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth (Percentage)");
-            svg.append("text").attr("text-anchor", "end").attr("transform", "rotate(-90)").attr("y", -margin.left+20).attr("x", -margin.top).text("Median Income (USD)");
+      svg.append("g")
+          .attr("transform", "translate(" + x(0) + ",0)")
+          .call(d3.axisLeft(y));
 
-            svg.append("g")
-                .attr("transform", "translate(" + x(0) + ",0)")
-                .call(d3.axisLeft(y));
+      function plotData(filterArea) {
+        // First, remove the existing circles
+        svg.selectAll("circle").remove();
 
-            svg.append("g")
-                .attr("transform", "translate(0," + y(35000) + ")")
-                .call(d3.axisBottom(x));
+        var filteredData = incomeData;
 
-            // Legend
-            var legend = svg.selectAll(".legend")
-                .data(color.domain())
-                .enter().append("g")
-                .attr("class", "legend")
-                .attr("transform", (d, i) => "translate(0," + i * 20 + ")");
+        if (filterArea !== "all") {
+          filteredData = incomeData.filter(d => d.Area === filterArea);
+        }
 
-            // Draw legend colored rectangles
-            legend.append("rect")
-                .attr("x", width - 18)
-                .attr("width", 18)
-                .attr("height", 18)
-                .style("fill", color);
+        // Plot data
+        svg.selectAll("dot")
+          .data(filteredData)
+          .enter().append("circle")
+          .attr("cx", function(d) { return x(d['YoY Growth']); })
+          .attr("cy", function(d) { return y(d['2021 Median income']); })
+          .attr("r", 5)
+          .style("fill", function(d) { return color(d.Area); })
+          .on("mouseover", function(event, d) {
+            tooltip.transition()
+              .duration(200)
+              .style("opacity", .9);
+            tooltip.html("State: " + d.State + "<br/>"  +
+                         "2021 Median income: " + d['2021 Median income'] + "<br/>" +
+                         "YoY Growth: " + d['YoY Growth'] + "%" + "<br/>" +
+                         "Area: " + d.Area)
+              .style("left", (event.pageX) + "px")
+              .style("top", (event.pageY - 28) + "px");
+          })
+          .on("mouseout", function(d) {
+            tooltip.transition()
+              .duration(500)
+              .style("opacity", 0);
+          });
+      }
 
-            // Draw legend text
-            legend.append("text")
-                .attr("x", width - 24)
-                .attr("y", 9)
-                .attr("dy", ".35em")
-                .style("text-anchor", "end")
-                .text(d => d);
+      // Initially plot all data
+      plotData("all");
 
-        // Create a div for the tooltip
-        var tooltip = d3.select("body")
-                .append("div")
-                .style("position", "absolute")
-                .style("z-index", "10")
-                .style("visibility", "hidden")
-                .style("background", "#ffffff")
-                .style("border", "solid")
-                .style("border-width", "1px")
-                .style("border-radius", "5px")
-                .style("padding", "10px");
-            });
-    </script>
-    <button class="button" onclick="location.href='page1.html'">Previous</button>
+      // React to changes in the dropdown menu
+      d3.select("#areaFilter").on("change", function() {
+        plotData(this.value.trim()); 
+      });
+    });
+  </script>
+  <div class="button-container">
+    <button class="button" onclick="location.href='index.html'">Previous</button>
+    <button class="button" onclick="location.href='page3.html'">Next</button>
+  </div>
 </body>
 </html>
