@@ -9,7 +9,7 @@
         <li>This scene labels the data points green if it is a rural state or yellow if it is a urban state.</li>
         <li>As you can see rural states have more income growth.</li>
     </ul>
-    <div id="filter-container">
+    <div id="filter-container" style="position: absolute; right: 20px; top: 20px;">
         <label for="urbanRuralFilter">Filter by Area Type:</label>
         <select id="urbanRuralFilter">
           <option value="all">All</option>
@@ -37,6 +37,22 @@
         var tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
+
+        // Create a variable to hold the current filter value. It's initially set to "all" 
+        let currentFilter = "all";
+
+        // Get the dropdown element from the DOM
+        var dropdown = document.getElementById("urbanRuralFilter");
+
+        // Add a change event handler to the dropdown
+        dropdown.addEventListener("change", function() {
+            // Get the new selected option
+            currentFilter = dropdown.options[dropdown.selectedIndex].value;
+
+            // Redraw the chart
+            drawChart();
+        });
+
         // Read the data
         Promise.all([
          d3.csv("State_Income_Clean.csv"),
@@ -51,12 +67,28 @@
            popLookup[d.State] = +d['Population Density'];
            });
 
-        incomeData.forEach(function(d) {
-        d.Density = popLookup[d.State] || 0;
-        d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
-        d['YoY Growth'] = +d['YoY Growth'].replace('%', '');
-        d.DensityGroup = d.Density > 113 ? 'Urban' : 'Rural';
+           incomeData.forEach(function(d) {
+            d.Density = popLookup[d.State] || 0;
+            d['2021 Median income'] = +d['2021 Median income'].replace(/,/g, '');
+            d['YoY Growth'] = +d['YoY Growth'].replace('%', '');
+            d.DensityGroup = d.Density > 113 ? 'Urban' : 'Rural';
+           });
+
+           // Call the drawChart function for the first time
+           drawChart();
         });
+
+        // Put your chart-drawing code into a function so you can call it again whenever the filter changes
+        function drawChart() {
+            // Clear the existing chart
+            svg.selectAll("*").remove();
+
+            // Draw the chart with the filtered data
+            // Use the filter() function to filter the data based on the current value of the filter
+            let filteredData = incomeData;
+            if (currentFilter != "all") {
+                filteredData = incomeData.filter(d => d.DensityGroup == currentFilter);
+            }
 
             // Create color scale
             const color = d3.scaleOrdinal()
@@ -66,34 +98,33 @@
             var highlightedStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
 
             // Axes and scales
-            const x = d3.scaleLinear().domain([d3.min(incomeData, d => d["YoY Growth"]), d3.max(incomeData, d => d["YoY Growth"])]).nice().range([0, width]);
-            const y = d3.scaleLinear().domain([35000, d3.max(incomeData, d => d["2021 Median income"])]).nice().range([height, 0]);
+            const x = d3.scaleLinear().domain([d3.min(filteredData, d => d["YoY Growth"]), d3.max(filteredData, d => d["YoY Growth"])]).nice().range([0, width]);
+            const y = d3.scaleLinear().domain([35000, d3.max(filteredData, d => d["2021 Median income"])]).nice().range([height, 0]);
 
             svg.append('g')
-             .selectAll("dot")
-   .data(incomeData)
-   .join("circle")
-   .attr("cx", function (d) { return x(d['YoY Growth']); } )
-   .attr("cy", function (d) { return y(d['2021 Median income']); } )
-   .attr("r", 5)
-   .attr("stroke", function(d) { return highlightedStates.includes(d.State) ? "lime" : "none"; })
-   .attr("stroke-width", function(d) { return highlightedStates.includes(d.State) ? 2 : 0; })
-   .style("fill", function(d) { 
-       if (d.DensityGroup == "Urban") { return "orange"; } 
-       else if (d.DensityGroup == "Rural") { return "green"; }
-   })
-   .on("mouseover", function(event, d) {
-       tooltip.style("visibility", "visible")
-           .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
-   })
-   .on("mousemove", function(event) {
-       tooltip.style("top", (event.pageY-10)+"px")
-           .style("left",(event.pageX+10)+"px");
-   })
-   .on("mouseout", function() {
-       tooltip.style("visibility", "hidden");
-   });
-
+            .selectAll("dot")
+            .data(filteredData)
+            .join("circle")
+            .attr("cx", function (d) { return x(d['YoY Growth']); } )
+            .attr("cy", function (d) { return y(d['2021 Median income']); } )
+            .attr("r", 5)
+            .attr("stroke", function(d) { return highlightedStates.includes(d.State) ? "lime" : "none"; })
+            .attr("stroke-width", function(d) { return highlightedStates.includes(d.State) ? 2 : 0; })
+            .style("fill", function(d) { 
+                if (d.DensityGroup == "Urban") { return "orange"; } 
+                else if (d.DensityGroup == "Rural") { return "green"; }
+            })
+            .on("mouseover", function(event, d) {
+                tooltip.style("visibility", "visible")
+                    .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}<br>Population Density: ${d.Density}`);
+            })
+            .on("mousemove", function(event) {
+                tooltip.style("top", (event.pageY-10)+"px")
+                    .style("left",(event.pageX+10)+"px");
+            })
+            .on("mouseout", function() {
+                tooltip.style("visibility", "hidden");
+            });
 
             // Axis labels
             svg.append("text").attr("text-anchor", "end").attr("x", width).attr("y", height + margin.top + 20).text("Year-Over-Year Growth (Percentage)");
@@ -128,20 +159,7 @@
                 .attr("dy", ".35em")
                 .style("text-anchor", "end")
                 .text(d => d);
-
-        // Create a div for the tooltip
-        var tooltip = d3.select("body")
-                .append("div")
-                .style("position", "absolute")
-                .style("z-index", "10")
-                .style("visibility", "hidden")
-                .style("background", "#ffffff")
-                .style("border", "solid")
-                .style("border-width", "1px")
-                .style("border-radius", "5px")
-                .style("padding", "10px");
-            });
+        }
     </script>
-    <button class="button" onclick="location.href='page1.html'">Previous</button>
 </body>
 </html>
