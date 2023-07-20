@@ -21,9 +21,12 @@
     </style>
 </head>
 <body>
-    <h1>Income by State</h1>
+    <h1>US State Income and Income Growth</h1>
     <ul>
-        <li>This is an interactive slideshow of what states have the highest income growth and what factors are correlated with that growth.</li>
+        <li>This is an interactive slideshow that explores which states have the highest income growth and what factors lead to that.</li>
+        <li>Below is a plot of median income and median income growth. The median income is from 2021 and the growth is from 2020 to 2021 median incomes.</li>
+        <li>We can see there are seven states that had top tier growth during this time period. These states are highlighted with a lime outline. We want to explore what they have in common.</li>
+        <li>Feel free to hover over the various data points and you will get a tooltip to get more information about that state.</li>
     </ul>
     <div id="scatter-plot"></div>
 
@@ -90,6 +93,11 @@
             .attr("cy", function (d) { return y(d['2021 Median income']); } )
             .attr("r", 5)
             .attr("fill", "green")
+            .style("stroke", function(d) { 
+            // Add stroke for selected states
+            var highlightStates = ["Idaho", "Montana", "Oklahoma", "Vermont", "Tennessee", "Maine", "Louisiana"];
+            return highlightStates.includes(d.State) ? "lime" : "none"; 
+  })
               .on("mouseover", function(event, d) {
                   tooltip.style("visibility", "visible")
                       .html(`State: ${d.State}<br>2021 Median Income: ${d['2021 Median income']}<br>YoY Growth: ${d['YoY Growth']}`);
